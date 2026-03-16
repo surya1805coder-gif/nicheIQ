@@ -9,7 +9,7 @@ interface Props {
   onClear: () => void;
 }
 
-export default function CompareTray({ selectedNiches, onCompare, onRemove, onClear }: Props) {
+export function CompareTray({ selectedNiches, onCompare, onRemove, onClear }: Props) {
   if (selectedNiches.length === 0) return null;
 
   return (

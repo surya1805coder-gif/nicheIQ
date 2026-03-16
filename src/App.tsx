@@ -5,7 +5,7 @@ import NicheGrid from './components/NicheGrid';
 import NicheDetail from './components/NicheDetail';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import AddNicheModal from './components/AddNicheModal';
-import CompareTray from './components/CompareTray';
+import { CompareTray } from './components/CompareTray';
 import NicheComparison from './components/NicheComparison';
 
 import type { Niche } from './types';

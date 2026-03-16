@@ -1,4 +1,4 @@
-export type Niche = {
+export interface Niche {
   id: number;
   name: string;
   category: string;
@@ -13,4 +13,4 @@ export type Niche = {
   cons: string[];
   tags: string[];
   created_at: string;
-};
+}
