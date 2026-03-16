@@ -1,19 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-import { TrendingUp, Zap, Target, DollarSign, Tag, Heart } from 'lucide-react';
+import { TrendingUp, Zap, Target, DollarSign, Tag, Heart, Copy } from 'lucide-react';
 
-import type { Niche } from '../App';
+
+import type { Niche } from '../types';
 
 type Props = { 
   niches: Niche[]; 
   loading: boolean; 
   favorites: number[];
   onToggleFavorite: (id: number) => void;
+  compareIds: number[];
+  onToggleCompare: (id: number) => void;
   onSelect: (n: Niche) => void 
 };
 
-export default function NicheGrid({ niches, loading, favorites, onToggleFavorite, onSelect }: Props) {
+export default function NicheGrid({ niches, loading, favorites, onToggleFavorite, compareIds, onToggleCompare, onSelect }: Props) {
+
   if (loading) return <div className="loading-state"><div className="spinner" /></div>;
   if (!niches.length) return <div className="empty-state"><p>No niches found. Try adjusting your filters.</p></div>;
 
@@ -26,8 +30,11 @@ export default function NicheGrid({ niches, loading, favorites, onToggleFavorite
           index={i} 
           isFavorite={favorites.includes(niche.id)}
           onToggleFavorite={onToggleFavorite}
+          isComparing={compareIds.includes(niche.id)}
+          onToggleCompare={onToggleCompare}
           onSelect={onSelect} 
         />
+
       ))}
     </div>
   );
@@ -54,17 +61,21 @@ interface NicheCardProps {
   index: number;
   isFavorite: boolean;
   onToggleFavorite: (id: number) => void;
+  isComparing: boolean;
+  onToggleCompare: (id: number) => void;
   onSelect: (n: Niche) => void;
 }
-
 
 function NicheCard({ 
   niche, 
   index, 
   isFavorite, 
   onToggleFavorite, 
+  isComparing,
+  onToggleCompare,
   onSelect 
 }: NicheCardProps) {
+
 
 
 
@@ -89,7 +100,15 @@ function NicheCard({
           >
             <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
           </button>
+          <button 
+            className={`compare-btn ${isComparing ? 'active' : ''}`}
+            onClick={(e: React.MouseEvent) => { e.stopPropagation(); onToggleCompare(niche.id); }}
+            title="Compare Niche"
+          >
+            <Copy size={16} />
+          </button>
           <div className="card-grade" style={{ color: gradeColor, borderColor: gradeColor }}>{opportunityGrade}</div>
+
         </div>
       </div>
       <h3 className="card-title">{niche.name}</h3>

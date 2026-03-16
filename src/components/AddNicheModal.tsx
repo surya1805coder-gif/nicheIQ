@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Plus } from 'lucide-react';
-import type { Niche } from '../App';
+import type { Niche } from '../types';
 
 type Props = { onClose: () => void; onSubmit: (niche: Partial<Niche>) => void };
 

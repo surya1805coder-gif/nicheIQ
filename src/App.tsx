@@ -5,26 +5,15 @@ import NicheGrid from './components/NicheGrid';
 import NicheDetail from './components/NicheDetail';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import AddNicheModal from './components/AddNicheModal';
+import CompareTray from './components/CompareTray';
+import NicheComparison from './components/NicheComparison';
+
+import type { Niche } from './types';
 import { Search, BarChart3, Grid3X3, Plus, TrendingUp, Zap } from 'lucide-react';
 
-export type Niche = {
-  id: number;
-  name: string;
-  category: string;
-  description: string;
-  opportunity_score: number;
-  competition_score: number;
-  trend_score: number;
-  market_size_usd: number;
-  audience_size: string;
-  monetization_methods: string[];
-  pros: string[];
-  cons: string[];
-  tags: string[];
-  created_at: string;
-};
 
-type View = 'dashboard' | 'explore' | 'analytics';
+type View = 'dashboard' | 'explore' | 'analytics' | 'comparison';
+
 
 export default function App() {
   const [view, setView] = useState<View>('dashboard');
@@ -39,6 +28,8 @@ export default function App() {
     const saved = localStorage.getItem('niche_favorites');
     return saved ? JSON.parse(saved) : [];
   });
+  const [compareIds, setCompareIds] = useState<number[]>([]);
+
 
   useEffect(() => {
     localStorage.setItem('niche_favorites', JSON.stringify(favorites));
@@ -47,6 +38,17 @@ export default function App() {
   const toggleFavorite = (id: number) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id]);
   };
+
+  const toggleCompare = (id: number) => {
+    setCompareIds(prev => {
+      if (prev.includes(id)) return prev.filter(cid => cid !== id);
+      if (prev.length >= 3) return prev; // Limit to 3 for side-by-side layout
+      return [...prev, id];
+    });
+  };
+
+  const clearCompare = () => setCompareIds([]);
+
 
   const fetchNiches = async () => {
     setLoading(true);
@@ -278,17 +280,28 @@ export default function App() {
                   loading={loading} 
                   favorites={favorites}
                   onToggleFavorite={toggleFavorite}
+                  compareIds={compareIds}
+                  onToggleCompare={toggleCompare}
                   onSelect={setSelectedNiche} 
                 />
               </motion.div>
             )}
-
+            {view === 'comparison' && (
+              <motion.div key="comparison" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}>
+                <NicheComparison 
+                  niches={niches.filter(n => compareIds.includes(n.id))} 
+                  onClose={() => setView('explore')} 
+                  onRemove={toggleCompare}
+                />
+              </motion.div>
+            )}
             {view === 'analytics' && (
               <motion.div key="analytics" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <AnalyticsPanel />
               </motion.div>
             )}
           </AnimatePresence>
+
         </div>
       </main>
 
@@ -301,9 +314,19 @@ export default function App() {
             onToggleFavorite={toggleFavorite}
             onClose={() => setSelectedNiche(null)} 
             onDelete={handleDeleteNiche} 
+            isComparing={compareIds.includes(selectedNiche.id)}
+            onToggleCompare={toggleCompare}
           />
         )}
       </AnimatePresence>
+
+      <CompareTray 
+        selectedNiches={niches.filter(n => compareIds.includes(n.id))}
+        onCompare={() => setView('comparison')}
+        onRemove={toggleCompare}
+        onClear={clearCompare}
+      />
+
 
 
 

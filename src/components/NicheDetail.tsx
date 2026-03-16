@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
-import { X, TrendingUp, Zap, Target, DollarSign, Users, CheckCircle, XCircle, Key, Trash2, Heart } from 'lucide-react';
+import { X, TrendingUp, Zap, Target, DollarSign, Users, CheckCircle, XCircle, Key, Trash2, Heart, Copy } from 'lucide-react';
 
-import type { Niche } from '../App';
+
+import type { Niche } from '../types';
 
 type Keyword = { id: number; niche_id: number; keyword: string; monthly_searches: number; cpc_usd: number; difficulty: number };
 
-type Props = { 
-  niche: Niche; 
+type Props = {
+  niche: Niche;
   isFavorite: boolean;
   onToggleFavorite: (id: number) => void;
-  onClose: () => void; 
-  onDelete: (id: number) => void 
+  onClose: () => void;
+  onDelete: (id: number) => void;
+  isComparing: boolean;
+  onToggleCompare: (id: number) => void;
 };
 
 
-export default function NicheDetail({ niche, isFavorite, onToggleFavorite, onClose, onDelete }: Props) {
+
+export default function NicheDetail({ niche, isFavorite, onToggleFavorite, onClose, onDelete, isComparing, onToggleCompare }: Props) {
+
 
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [loadingKw, setLoadingKw] = useState(true);
@@ -62,14 +67,22 @@ export default function NicheDetail({ niche, isFavorite, onToggleFavorite, onClo
             <h2 className="detail-title">{niche.name}</h2>
           </div>
           <div className="detail-actions">
-            <button 
+            <button
               className={`fav-btn ${isFavorite ? 'active' : ''}`}
               onClick={() => onToggleFavorite(niche.id)}
               style={{ fontSize: '1.2rem' }}
             >
               <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
             </button>
+            <button
+              className={`icon-btn ${isComparing ? 'active' : ''}`}
+              onClick={() => onToggleCompare(niche.id)}
+              title="Compare Niche"
+            >
+              <Copy size={16} />
+            </button>
             <button className="icon-btn danger" onClick={() => { if (window.confirm('Delete this niche?')) onDelete(niche.id); }}>
+
 
               <Trash2 size={16} />
             </button>

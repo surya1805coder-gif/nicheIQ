@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, Target, Zap, DollarSign, ArrowRight, Award, Heart } from 'lucide-react';
 
-import type { Niche } from '../App';
+import type { Niche } from '../types';
 
 type Props = { niches: Niche[]; loading: boolean; favorites: number[]; onSelectNiche: (n: Niche) => void };
 
