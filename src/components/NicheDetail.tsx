@@ -1,13 +1,23 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { motion } from 'framer-motion';
-import { X, TrendingUp, Zap, Target, DollarSign, Users, CheckCircle, XCircle, Key, Trash2 } from 'lucide-react';
+import { X, TrendingUp, Zap, Target, DollarSign, Users, CheckCircle, XCircle, Key, Trash2, Heart } from 'lucide-react';
+
 import type { Niche } from '../App';
 
 type Keyword = { id: number; niche_id: number; keyword: string; monthly_searches: number; cpc_usd: number; difficulty: number };
 
-type Props = { niche: Niche; onClose: () => void; onDelete: (id: number) => void };
+type Props = { 
+  niche: Niche; 
+  isFavorite: boolean;
+  onToggleFavorite: (id: number) => void;
+  onClose: () => void; 
+  onDelete: (id: number) => void 
+};
 
-export default function NicheDetail({ niche, onClose, onDelete }: Props) {
+
+export default function NicheDetail({ niche, isFavorite, onToggleFavorite, onClose, onDelete }: Props) {
+
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [loadingKw, setLoadingKw] = useState(true);
 
@@ -52,12 +62,21 @@ export default function NicheDetail({ niche, onClose, onDelete }: Props) {
             <h2 className="detail-title">{niche.name}</h2>
           </div>
           <div className="detail-actions">
-            <button className="icon-btn danger" onClick={() => { if (confirm('Delete this niche?')) onDelete(niche.id); }}>
+            <button 
+              className={`fav-btn ${isFavorite ? 'active' : ''}`}
+              onClick={() => onToggleFavorite(niche.id)}
+              style={{ fontSize: '1.2rem' }}
+            >
+              <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+            </button>
+            <button className="icon-btn danger" onClick={() => { if (window.confirm('Delete this niche?')) onDelete(niche.id); }}>
+
               <Trash2 size={16} />
             </button>
             <button className="icon-btn" onClick={onClose}><X size={18} /></button>
           </div>
         </div>
+
 
         <div className="detail-body">
           <p className="detail-desc">{niche.description}</p>
@@ -148,7 +167,8 @@ export default function NicheDetail({ niche, onClose, onDelete }: Props) {
                   <span>CPC</span>
                   <span>Difficulty</span>
                 </div>
-                {keywords.slice(0, 8).map(kw => (
+                {keywords.slice(0, 8).map((kw: Keyword) => (
+
                   <div key={kw.id} className="kw-row">
                     <span className="kw-name">{kw.keyword}</span>
                     <span className="kw-searches">{kw.monthly_searches.toLocaleString()}</span>

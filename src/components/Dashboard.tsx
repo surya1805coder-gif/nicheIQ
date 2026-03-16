@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, Target, Zap, DollarSign, ArrowRight, Award } from 'lucide-react';
+import { TrendingUp, Target, Zap, DollarSign, ArrowRight, Award, Heart } from 'lucide-react';
+
 import type { Niche } from '../App';
 
-type Props = { niches: Niche[]; loading: boolean; onSelectNiche: (n: Niche) => void };
+type Props = { niches: Niche[]; loading: boolean; favorites: number[]; onSelectNiche: (n: Niche) => void };
 
-export default function Dashboard({ niches, loading, onSelectNiche }: Props) {
+
+export default function Dashboard({ niches, loading, favorites, onSelectNiche }: Props) {
+
   if (loading) return <div className="loading-state"><div className="spinner" /></div>;
 
   const topOpportunity = [...niches].sort((a, b) => b.opportunity_score - a.opportunity_score).slice(0, 3);
@@ -39,10 +42,11 @@ export default function Dashboard({ niches, loading, onSelectNiche }: Props) {
 
       {/* Lists */}
       <div className="dashboard-lists">
-        <NicheList title="Top Opportunities" icon={<Zap size={16} />} niches={topOpportunity} scoreKey="opportunity_score" scoreLabel="Opp" color="#22d3ee" onSelect={onSelectNiche} />
-        <NicheList title="Trending Now" icon={<TrendingUp size={16} />} niches={topTrending} scoreKey="trend_score" scoreLabel="Trend" color="#a78bfa" onSelect={onSelectNiche} />
-        <NicheList title="Low Competition" icon={<Award size={16} />} niches={lowestComp} scoreKey="competition_score" scoreLabel="Comp" color="#34d399" invert onSelect={onSelectNiche} />
+        <NicheList title="Top Opportunities" icon={<Zap size={16} />} niches={topOpportunity} scoreKey="opportunity_score" scoreLabel="Opp" color="#22d3ee" favorites={favorites} onSelect={onSelectNiche} />
+        <NicheList title="Trending Now" icon={<TrendingUp size={16} />} niches={topTrending} scoreKey="trend_score" scoreLabel="Trend" color="#a78bfa" favorites={favorites} onSelect={onSelectNiche} />
+        <NicheList title="Low Competition" icon={<Award size={16} />} niches={lowestComp} scoreKey="competition_score" scoreLabel="Comp" color="#34d399" favorites={favorites} onSelect={onSelectNiche} />
       </div>
+
 
       {/* Market Bar */}
       <motion.div className="market-bar-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
@@ -53,7 +57,8 @@ export default function Dashboard({ niches, loading, onSelectNiche }: Props) {
   );
 }
 
-function NicheList({ title, icon, niches, scoreKey, scoreLabel, color, onSelect }: any) {
+function NicheList({ title, icon, niches, scoreKey, scoreLabel, color, favorites, onSelect }: any) {
+
   return (
     <motion.div className="niche-list-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
       <div className="list-header">
@@ -61,18 +66,22 @@ function NicheList({ title, icon, niches, scoreKey, scoreLabel, color, onSelect 
         <h3>{title}</h3>
       </div>
       {niches.map((n: Niche, i: number) => (
-        <button key={n.id} className="list-niche-row" onClick={() => onSelect(n)}>
-          <span className="rank">#{i + 1}</span>
-          <div className="list-niche-info">
-            <span className="list-niche-name">{n.name}</span>
-            <span className="list-niche-cat">{n.category}</span>
+          <div key={n.id} className="list-niche-row" onClick={() => onSelect(n)}>
+            <span className="rank">#{i + 1}</span>
+            <div className="list-niche-info">
+              <span className="list-niche-name">{n.name}</span>
+              <span className="list-niche-cat">{n.category}</span>
+            </div>
+            <div className="list-score-area">
+              {favorites.includes(n.id) && <Heart size={12} className="fav-indicator" fill="currentColor" />}
+              <div className="list-score" style={{ color }}>
+                <span>{(n as any)[scoreKey]}</span>
+                <span className="score-label">{scoreLabel}</span>
+              </div>
+            </div>
+            <ArrowRight size={14} className="row-arrow" />
           </div>
-          <div className="list-score" style={{ color }}>
-            <span>{(n as any)[scoreKey]}</span>
-            <span className="score-label">{scoreLabel}</span>
-          </div>
-          <ArrowRight size={14} className="row-arrow" />
-        </button>
+
       ))}
     </motion.div>
   );

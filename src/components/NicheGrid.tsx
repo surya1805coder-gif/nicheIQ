@@ -1,21 +1,38 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Zap, Target, DollarSign, Tag } from 'lucide-react';
+
+import { TrendingUp, Zap, Target, DollarSign, Tag, Heart } from 'lucide-react';
+
 import type { Niche } from '../App';
 
-type Props = { niches: Niche[]; loading: boolean; onSelect: (n: Niche) => void };
+type Props = { 
+  niches: Niche[]; 
+  loading: boolean; 
+  favorites: number[];
+  onToggleFavorite: (id: number) => void;
+  onSelect: (n: Niche) => void 
+};
 
-export default function NicheGrid({ niches, loading, onSelect }: Props) {
+export default function NicheGrid({ niches, loading, favorites, onToggleFavorite, onSelect }: Props) {
   if (loading) return <div className="loading-state"><div className="spinner" /></div>;
   if (!niches.length) return <div className="empty-state"><p>No niches found. Try adjusting your filters.</p></div>;
 
   return (
     <div className="niche-grid">
       {niches.map((niche, i) => (
-        <NicheCard key={niche.id} niche={niche} index={i} onSelect={onSelect} />
+        <NicheCard 
+          key={niche.id} 
+          niche={niche} 
+          index={i} 
+          isFavorite={favorites.includes(niche.id)}
+          onToggleFavorite={onToggleFavorite}
+          onSelect={onSelect} 
+        />
       ))}
     </div>
   );
 }
+
 
 function ScoreBar({ value, color }: { value: number; color: string }) {
   return (
@@ -31,22 +48,49 @@ function ScoreBar({ value, color }: { value: number; color: string }) {
   );
 }
 
-function NicheCard({ niche, index, onSelect }: { niche: Niche; index: number; onSelect: (n: Niche) => void }) {
+interface NicheCardProps {
+  key?: any;
+  niche: Niche;
+  index: number;
+  isFavorite: boolean;
+  onToggleFavorite: (id: number) => void;
+  onSelect: (n: Niche) => void;
+}
+
+
+function NicheCard({ 
+  niche, 
+  index, 
+  isFavorite, 
+  onToggleFavorite, 
+  onSelect 
+}: NicheCardProps) {
+
+
+
   const opportunityGrade = niche.opportunity_score >= 80 ? 'A+' : niche.opportunity_score >= 65 ? 'A' : niche.opportunity_score >= 50 ? 'B' : 'C';
-  const gradeColor = niche.opportunity_score >= 80 ? '#22d3ee' : niche.opportunity_score >= 65 ? '#34d399' : niche.opportunity_score >= 50 ? '#f59e0b' : '#f87171';
+  const gradeColor = niche.opportunity_score >= 80 ? 'var(--accent)' : niche.opportunity_score >= 65 ? 'var(--accent3)' : niche.opportunity_score >= 50 ? '#f59e0b' : 'var(--danger)';
 
   return (
     <motion.div
-      className="niche-card"
+      className={`niche-card ${isFavorite ? 'is-fav' : ''}`}
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.35 }}
       onClick={() => onSelect(niche)}
-      whileHover={{ y: -4 }}
     >
       <div className="card-header">
         <div className="card-category">{niche.category}</div>
-        <div className="card-grade" style={{ color: gradeColor, borderColor: gradeColor }}>{opportunityGrade}</div>
+        <div className="card-actions">
+          <button 
+            className={`fav-btn ${isFavorite ? 'active' : ''}`}
+            onClick={(e: React.MouseEvent) => { e.stopPropagation(); onToggleFavorite(niche.id); }}
+
+          >
+            <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+          </button>
+          <div className="card-grade" style={{ color: gradeColor, borderColor: gradeColor }}>{opportunityGrade}</div>
+        </div>
       </div>
       <h3 className="card-title">{niche.name}</h3>
       <p className="card-desc">{niche.description?.slice(0, 90)}...</p>
@@ -54,10 +98,10 @@ function NicheCard({ niche, index, onSelect }: { niche: Niche; index: number; on
       <div className="card-scores">
         <div className="score-row">
           <div className="score-meta">
-            <Zap size={12} style={{ color: '#22d3ee' }} />
+            <Zap size={12} style={{ color: 'var(--accent)' }} />
             <span>Opportunity</span>
           </div>
-          <ScoreBar value={niche.opportunity_score} color="#22d3ee" />
+          <ScoreBar value={niche.opportunity_score} color="var(--accent)" />
           <span className="score-num">{niche.opportunity_score}</span>
         </div>
         <div className="score-row">
@@ -70,10 +114,10 @@ function NicheCard({ niche, index, onSelect }: { niche: Niche; index: number; on
         </div>
         <div className="score-row">
           <div className="score-meta">
-            <TrendingUp size={12} style={{ color: '#a78bfa' }} />
+            <TrendingUp size={12} style={{ color: 'var(--accent2)' }} />
             <span>Trend</span>
           </div>
-          <ScoreBar value={niche.trend_score} color="#a78bfa" />
+          <ScoreBar value={niche.trend_score} color="var(--accent2)" />
           <span className="score-num">{niche.trend_score}</span>
         </div>
       </div>
@@ -92,3 +136,4 @@ function NicheCard({ niche, index, onSelect }: { niche: Niche; index: number; on
     </motion.div>
   );
 }
+

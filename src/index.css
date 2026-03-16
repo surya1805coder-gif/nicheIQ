@@ -2,22 +2,30 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0c10;
-  --bg2: #0f1218;
-  --bg3: #161b24;
-  --bg4: #1d2433;
+  --bg: #05070a;
+  --bg2: rgba(15, 18, 24, 0.7);
+  --bg3: rgba(22, 27, 36, 0.8);
+  --bg4: rgba(29, 36, 51, 0.9);
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
   --border: #1e2a3a;
-  --border2: #2a3a50;
-  --text: #e8edf5;
-  --text2: #8899aa;
-  --text3: #4a5568;
+  --border2: #2d3d54;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
   --accent: #22d3ee;
+  --accent-glow: rgba(34, 211, 238, 0.3);
   --accent2: #a78bfa;
-  --accent3: #34d399;
-  --danger: #f87171;
+  --accent2-glow: rgba(167, 139, 250, 0.3);
+  --accent3: #10b981;
+  --danger: #ef4444;
   --font: 'Syne', sans-serif;
   --mono: 'JetBrains Mono', monospace;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--glass-border);
 }
+
 
 * { box-sizing: border-box; }
 
@@ -39,15 +47,18 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 220px;
-  min-width: 220px;
+  width: 240px;
+  min-width: 240px;
   background: var(--bg2);
-  border-right: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   padding: 0;
   overflow: hidden;
+  z-index: 10;
 }
+
 
 .sidebar-logo {
   display: flex;
@@ -151,11 +162,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 28px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(5, 7, 10, 0.5);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
   flex-shrink: 0;
 }
+
 
 .page-title {
   font-size: 1.4rem;
@@ -293,13 +309,21 @@ body {
 
 .stat-card {
   background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
 
 .stat-icon {
   width: 40px;
@@ -326,10 +350,12 @@ body {
 
 .niche-list-card {
   background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
 }
+
 
 .list-header {
   display: flex;
@@ -441,17 +467,39 @@ body {
 
 .niche-card {
   background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.niche-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, var(--accent-glow), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
 }
 
 .niche-card:hover {
-  border-color: var(--border2);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-premium);
 }
+
+.niche-card:hover::before {
+  opacity: 1;
+}
+
 
 .card-header {
   display: flex;
@@ -468,6 +516,33 @@ body {
   letter-spacing: 0.05em;
 }
 
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fav-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text3);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fav-btn:hover {
+  color: var(--danger);
+  transform: scale(1.1);
+}
+
+.fav-btn.active {
+  color: var(--danger);
+}
+
 .card-grade {
   font-size: 0.75rem;
   font-weight: 800;
@@ -475,7 +550,9 @@ body {
   border: 1.5px solid;
   border-radius: 6px;
   padding: 1px 7px;
+  background: rgba(0, 0, 0, 0.2);
 }
+
 
 .card-title {
   font-size: 1rem;
